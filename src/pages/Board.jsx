@@ -159,7 +159,14 @@ async function handleRenameList() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <button 
+      <button style={{
+        padding: '10px 20px',
+        background: '#444',
+        border : 'none',
+        borderRadius: '6px' ,
+        cursor : 'pointer' ,
+        marginBottom : '20px'
+      }}
       onClick={() => nav('/boards')}
       >
         Back to boards
