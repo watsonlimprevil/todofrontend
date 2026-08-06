@@ -156,7 +156,18 @@ async function handleRenameList() {
 }
 
 
+async function handleDeleteTask(taskId , listId){
+  await api(`/tasks/${taskId}` ,  {
+    method : 'DELETE'
+  });
 
+  const updatedLists = lists.map(list => 
+    list.id === listId ?
+    {...list , tasks:list.tasks.filter(task => task.id !== taskId)}
+    : list
+  );
+  setLists(updatedLists);
+}
   return (
     <div style={{ padding: '20px' }}>
       <button style={{
@@ -352,6 +363,19 @@ async function handleRenameList() {
                           }}
                         >
                           {task.title}
+                          < button onClick={ () =>handleDeleteTask(task.id , list.id)} 
+                          
+                          style={{
+                            marginTop : '5px',
+                            padding : '5px' ,
+                            background : '#b71c1c' ,
+                            border : 'none' ,
+                            borderRadius : '4px' ,
+                            cursor : 'pointer',
+                            color : 'white'
+                          }}>
+                            Delete
+                          </button>
                         </div>
                       )}
                     </Draggable>
