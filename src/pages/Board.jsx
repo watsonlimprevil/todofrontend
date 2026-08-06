@@ -8,7 +8,7 @@ export default function Board() {
   const { id } = useParams();
   const nav = useNavigate();
   const [lists, setLists] = useState([]);
-
+  const [listTitle , setListTitle] = useState('')
   const [showListModal, setShowListModal] = useState(false);
   const [TitleToEdit, setTitleToEdit] = useState('');
   const [showRenameListModal , setShowRenameListModal] = useState(false);
@@ -136,6 +136,15 @@ const updatedLists = lists.map(list => {
 
       persistMove(draggableId, destListId, destination.index);
     }
+  }
+
+  async function handleDeleteList(listId){
+    if(!window.confirm('Delete this list')) return;
+
+    await api(`/lists/${listId}`, {method: 'DELETE'})
+
+    const updated = lists.filter(list => list.id !== listId);
+    setLists(updated)
   }
 
 async function handleRenameList() {
@@ -328,6 +337,19 @@ async function handleDeleteTask(taskId , listId){
                   }}>
                     + Rename
                   </button>
+                  <button onClick={() => handleDeleteList(list.id)}
+                    style={{
+                      background : '#b71c1c',
+                      border: 'none',
+                      padding: '6px 10px',
+                      borderRadius : '6px',
+                      cursor : 'pointer' ,
+                      color : 'white',
+                      marginLeft : '10px'
+                    }}
+                    >
+                      Delete List 🗑️
+                  </button>
                   {showRenameListModal && (
                     <div 
                     style={{
@@ -359,22 +381,23 @@ async function handleDeleteTask(taskId , listId){
                             padding: '10px',
                             borderRadius: '6px',
                             marginTop: '10px',
+                            gap: '10px',
                             ...provided.draggableProps.style
                           }}
                         >
                           {task.title}
                           < button onClick={ () =>handleDeleteTask(task.id , list.id)} 
                           
-                          style={{
-                            marginTop : '5px',
-                            padding : '5px' ,
-                            background : '#b71c1c' ,
-                            border : 'none' ,
-                            borderRadius : '4px' ,
-                            cursor : 'pointer',
-                            color : 'white'
-                          }}>
-                            Delete
+                        style={{
+                           background: 'transparent',
+                           border: 'none',
+                           color: '#ff6b6b',
+                           fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                             marginLeft: '10px'   // ⭐ spacing from the task text
+                              }}>
+                            ❌
                           </button>
                         </div>
                       )}
