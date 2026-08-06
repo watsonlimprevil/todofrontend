@@ -183,7 +183,9 @@ async function handleUpdateTask() {
     method: 'PATCH',
     body: JSON.stringify({
       title: slectedTask.title,
-      description: slectedTask.description
+      description: slectedTask.description,
+      priority: slectedTask.priority,
+      due_date: slectedTask.due_date
     })
   });
 
@@ -421,6 +423,44 @@ return (
               marginTop: '10px',
               height: '100px'
             }}
+
+          />
+          <select 
+          value={slectedTask.priority || 'low'}
+          onChange={(e) => 
+            setSelectedTask({...slectedTask , priority:e.target.value})
+          }
+
+          style={{
+            width : '100%',
+            padding: '10px',
+            marginTop : '10px',
+            background: '#2e2e2e',
+            color: 'white',
+            borderRadius: '6px'
+          }}
+          >
+            <option value={'low'}>Low Priority</option>
+            <option value={'medium'}>Medium Priority</option>
+            <option value={'high'}>High Priority</option>
+
+          </select>
+
+          <input 
+          type='date'
+          value={slectedTask.due_date || ''}
+          onChange={(e) => 
+            setSelectedTask({...slectedTask , due_date:e.target.value})
+          }
+
+          style={{
+            width: '100%',
+            padding : '10px',
+            marginTop: '10px',
+            background: '#2e2e2e',
+            color : 'white',
+            borderRadius : '6px'
+          }}
           />
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
@@ -532,6 +572,8 @@ return (
                     key={task.id}
                     draggableId={String(task.id)}
                     index={index}
+
+
                   >
                     {(provided) => (
                       <div
@@ -553,6 +595,25 @@ return (
                         }}
                       >
                         {task.title}
+
+                          {/* ⭐ Priority indicator goes RIGHT HERE */}
+                         <div style={{ fontSize: '12px', marginTop: '5px' }}>
+                           {task.priority === 'high' && (
+                              <span style={{ color: '#ff4d4d' }}>🔥 High</span>
+                              )}
+                             {task.priority === 'medium' && (
+                             <span style={{ color: '#ffcc00' }}>⚠️ Medium</span>
+                              )}
+                             {task.priority === 'low' && (
+                                <span style={{ color: '#4caf50' }}>🟢 Low</span>
+                                 )}
+                              </div>
+
+                              {task.due_date && (
+                                <div style={{fontSize : '12px', color : '#90caf9' , marginTop:'5px'}}>
+                                  📆 Due : {task.due_date}
+                                </div>
+                              )}
 
                         <button
                           onClick={() =>

@@ -14,7 +14,7 @@ export default function Signup() {
 
     const data = await signup(email, password);
     if (data.error) setError(data.error);
-    nav('/boards')
+    nav('/login')
   };
 
   return (
