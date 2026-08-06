@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../Api/client';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -6,7 +6,7 @@ import js from '@eslint/js';
 
 export default function Board() {
   const { id } = useParams();
-
+  const nav = useNavigate();
   const [lists, setLists] = useState([]);
 
   const [showListModal, setShowListModal] = useState(false);
@@ -159,6 +159,11 @@ async function handleRenameList() {
 
   return (
     <div style={{ padding: '20px' }}>
+      <button 
+      onClick={() => nav('/boards')}
+      >
+        Back to boards
+      </button>
       <h1>Board #{id}</h1>
 
       <button
