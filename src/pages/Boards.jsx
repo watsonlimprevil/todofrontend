@@ -23,105 +23,152 @@ export default function Boards() {
     setTitle('');
   }
 
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>Your Boards</h1>
+  async function handleDelteBoard(boardId){
+    const newBoard = await api(`/boards/${boardId}` , {
+      method : 'DELETE'
+    });
+    const filteredBoard = boards.filter(board => board.id !== boardId);
+    setBoards(filteredBoard)
+  }
 
-      <button
-        onClick={() => setShowModal(true)}
-        style={{
-          padding: '10px 20px',
-          background: '#4caf50',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          marginBottom: '20px'
-        }}
-      >
-        + New Board
-      </button>
+return (
+  <div style={{ padding: '20px' }}>
+    <h1>Your Boards</h1>
 
-      {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <div
-            style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '300px'
-            }}
-          >
-            <h2>Create Board</h2>
+    <button
+      onClick={() => setShowModal(true)}
+      style={{
+        padding: '10px 20px',
+        background: '#4caf50',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        marginBottom: '20px'
+      }}
+    >
+      + New Board
+    </button>
 
-            <input
-              type="text"
-              placeholder="Board title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-            />
-            <input
-               type="text"
-               placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-             />
-
-
-            <button
-              onClick={handleCreateBoard}
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                width: '100%',
-                background: '#4caf50',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              Create
-            </button>
-          </div>
-        </div>
-      )}
-
+    {showModal && (
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '20px',
-          marginTop: '20px'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        {boards.map((board) => (
-          <div
-            key={board.id}
-            onClick={() => Navigate(`/boards/${board.id}`)}
+        <div
+          style={{
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '300px'
+          }}
+        >
+          <h2>Create Board</h2>
+
+          <input
+            type="text"
+            placeholder="Board title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
+
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
+
+          <button
+            onClick={handleCreateBoard}
             style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
+              marginTop: '15px',
+              padding: '10px',
+              width: '100%',
+              background: '#4caf50',
+              border: 'none',
+              borderRadius: '6px',
               cursor: 'pointer'
             }}
           >
-            {board.title}
-
-          </div>
-        ))}
+            Create
+          </button>
+          <button 
+          onClick={() => {
+            setShowModal(false);
+            setTitle('');
+            setDescription('')
+          }}
+          style={{
+            padding : '8px 12px',
+            background: '#b71c1c',
+            border: 'none',
+            cursor : 'pointer',
+            color : 'white'
+          }}
+          >
+            ❌ Cancel
+          </button>
+        </div>
       </div>
+    )}
+
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '20px',
+        marginTop: '20px'
+      }}
+    >
+      {boards.map((board) => (
+        <div
+          key={board.id}
+          style={{
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}
+        >
+          <span
+            onClick={() => Navigate(`/boards/${board.id}`)}
+            style={{ cursor: 'pointer', fontSize: '18px' }}
+          >
+            {board.title}
+          </span>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // prevents navigation
+              handleDelteBoard(board.id);
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#ff6b6b',
+              fontSize: '20px',
+              cursor: 'pointer'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
     </div>
-  );
+  </div>
+);
+
 }

@@ -253,6 +253,21 @@ async function handleDeleteTask(taskId , listId){
             >
               Create
             </button>
+            <button 
+             onClick={() => {
+              setShowListModal(false);
+              setListTitle('');
+            }}
+          style={{
+            padding : '8px 12px',
+            background: '#b71c1c',
+            border: 'none',
+            cursor : 'pointer',
+            color : 'white'
+          }}
+          >
+            ❌ Cancel
+          </button>
           </div>
         </div>
       )}
@@ -303,6 +318,22 @@ async function handleDeleteTask(taskId , listId){
             >
               Create
             </button>
+            <button 
+          onClick={() => {
+            setShowModal(false);
+            setTaskTitle('');
+            
+          }}
+          style={{
+            padding : '8px 12px',
+            background: '#b71c1c',
+            border: 'none',
+            cursor : 'pointer',
+            color : 'white'
+          }}
+          >
+            ❌ Cancel
+          </button>
           </div>
         </div>
       )}
