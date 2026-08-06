@@ -1,30 +1,46 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../Api/client';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import js from '@eslint/js';
 
 export default function Board() {
   const { id } = useParams();
 
   const [lists, setLists] = useState([]);
 
-  // Create List modal state
   const [showListModal, setShowListModal] = useState(false);
-  const [listTitle, setListTitle] = useState('');
+  const [TitleToEdit, setTitleToEdit] = useState('');
+  const [showRenameListModal , setShowRenameListModal] = useState(false);
+  const [renameListId , setRenameListId] = useState(null);
 
-  // Create Task modal state
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [activeListId, setActiveListId] = useState(null);
 
-  useEffect(() => {
-    api(`/boards/${id}/lists`).then(setLists);
-  }, [id]);
+useEffect(() => {
+  async function loadBoard() {
+    const listsFromServer = await api(`/lists/${id}`);
 
-  // Create List
+    const listsWithTasks = await Promise.all(
+      listsFromServer.map(async (list) => {
+        const tasks = await api(`/tasks/${list.id}`);
+        return { ...list, tasks };
+      })
+    );
+
+    setLists(listsWithTasks);
+  }
+
+  loadBoard();
+}, [id]);
+
   async function handleCreateList() {
-    const newList = await api(`/boards/${id}/lists`, {
+    console.log("boardIn (id):", id)
+    const position = lists.length;
+    const newList = await api(`/lists/${id}`, {
       method: 'POST',
-      body: { title: listTitle }
+      body: JSON.stringify({ title: listTitle , position: position})
     });
 
     setLists([...lists, newList]);
@@ -32,17 +48,15 @@ export default function Board() {
     setListTitle('');
   }
 
-  // Open Task modal
   function openTaskModal(listId) {
     setActiveListId(listId);
     setShowTaskModal(true);
   }
 
-  // Create Task
   async function handleCreateTask() {
-    const newTask = await api(`/lists/${activeListId}/tasks`, {
+    const newTask = await api(`/tasks/${activeListId}`, {
       method: 'POST',
-      body: { title: taskTitle }
+      body: JSON.stringify({ title: taskTitle })
     });
 
     const updatedLists = lists.map(list =>
@@ -56,11 +70,97 @@ export default function Board() {
     setTaskTitle('');
   }
 
+async function persistMove(taskId, toListId, position) {
+  await api(`/tasks/${taskId}/move`, {
+    method: 'PATCH',
+    body: JSON.stringify({ toListId, position })
+  });
+}
+
+
+
+  function handleDragEnd(result) {
+    const { source, destination, draggableId } = result;
+
+    if (!destination) return;
+
+    const sourceListId = parseInt(source.droppableId);
+    const destListId = parseInt(destination.droppableId);
+
+    const sourceList = lists.find(list => list.id === sourceListId);
+    const destList = lists.find(list => list.id === destListId);
+
+    const sourceTasks = Array.from(sourceList.tasks || []);
+    const [movedTask] = sourceTasks.splice(source.index, 1);
+
+    if (sourceListId === destListId) {
+    sourceTasks.splice(destination.index, 0, movedTask);
+
+// ⭐ Reindex positions
+      const reindexed = sourceTasks.map((task, index) => ({
+       ...task,
+         position: index
+        }));
+
+const updatedLists = lists.map(list =>
+  list.id === sourceListId ? { ...list, tasks: reindexed } : list
+);
+
+
+      setLists(updatedLists);
+
+      persistMove(draggableId, destListId, destination.index);
+    } else {
+      const destTasks = Array.from(destList.tasks || []);
+    destTasks.splice(destination.index, 0, movedTask);
+
+// ⭐ Reindex both lists
+     const reindexedSource = sourceTasks.map((task, index) => ({
+      ...task,
+       position: index
+      }));
+
+      const reindexedDest = destTasks.map((task, index) => ({
+       ...task,
+        position: index
+       }));
+
+const updatedLists = lists.map(list => {
+  if (list.id === sourceListId) return { ...list, tasks: reindexedSource };
+  if (list.id === destListId) return { ...list, tasks: reindexedDest };
+  return list;
+});
+
+
+      setLists(updatedLists);
+
+      persistMove(draggableId, destListId, destination.index);
+    }
+  }
+
+async function handleRenameList() {
+  const updatedList = await api(`/lists/${renameListId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ title: TitleToEdit })
+  });
+
+  const updatedLists = lists.map(list =>
+    list.id === renameListId
+      ? { ...list, ...updatedList }   // ⭐ merge instead of replace
+      : list
+  );
+
+  setLists(updatedLists);
+  setShowRenameListModal(false);
+  setTitleToEdit('');
+}
+
+
+
   return (
     <div style={{ padding: '20px' }}>
       <h1>Board #{id}</h1>
 
-      {/* Create List Button */}
       <button
         onClick={() => setShowListModal(true)}
         style={{
@@ -75,7 +175,6 @@ export default function Board() {
         + New List
       </button>
 
-      {/* Create List Modal */}
       {showListModal && (
         <div
           style={{
@@ -126,7 +225,6 @@ export default function Board() {
         </div>
       )}
 
-      {/* Create Task Modal */}
       {showTaskModal && (
         <div
           style={{
@@ -177,59 +275,98 @@ export default function Board() {
         </div>
       )}
 
-      {/* Lists + Tasks */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '20px',
-          marginTop: '20px'
-        }}
-      >
-        {lists.map((list) => (
-          <div
-            key={list.id}
-            style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '250px'
-            }}
-          >
-            <h3>{list.title}</h3>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '20px',
+            marginTop: '20px'
+          }}
+        >
+          {lists.map((list) => (
+            <Droppable droppableId={String(list.id)} key={list.id}>
+              {(provided) => (
+                <div
+                key={list.id}
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  style={{
+                    background: '#1e1e1e',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    width: '250px',
+                    minHeight: '100px'
+                  }}
+                >
+                  <h3>{list.title}</h3>
+                  <button onClick={() => {
+                   setRenameListId(list.id);
+                   setShowRenameListModal(true)
+                  }}>
+                    + Rename
+                  </button>
+                  {showRenameListModal && (
+                    <div 
+                    style={{
+                      backgroundC: '#1e1e1e',
+                      padding: '20px',
+                      borderRadius: '8px'
+                    }}>
+                      <input 
+                      value={TitleToEdit}
+                      onChange={e => setTitleToEdit(e.target.value)}
+                      placeholder='enter new name...'
+                      />
+                      <button onClick={handleRenameList}>Edit</button>
+                    </div>
+                  )}
+                  {list.tasks?.map((task, index) => (
+                    <Draggable
+                      key={task.id}
+                      draggableId={String(task.id)}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            background: '#2e2e2e',
+                            padding: '10px',
+                            borderRadius: '6px',
+                            marginTop: '10px',
+                            ...provided.draggableProps.style
+                          }}
+                        >
+                          {task.title}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
 
-            {/* Tasks */}
-            {list.tasks?.map((task) => (
-              <div
-                key={task.id}
-                style={{
-                  background: '#2e2e2e',
-                  padding: '10px',
-                  borderRadius: '6px',
-                  marginTop: '10px'
-                }}
-              >
-                {task.title}
-              </div>
-            ))}
+                  {provided.placeholder}
 
-            {/* Add Task Button */}
-            <button
-              onClick={() => openTaskModal(list.id)}
-              style={{
-                marginTop: '10px',
-                padding: '8px',
-                width: '100%',
-                background: '#673ab7',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              + Add Task
-            </button>
-          </div>
-        ))}
-      </div>
+                  <button
+                    onClick={() => openTaskModal(list.id)}
+                    style={{
+                      marginTop: '10px',
+                      padding: '8px',
+                      width: '100%',
+                      background: '#673ab7',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + Add Task
+                  </button>
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
+      </DragDropContext>
     </div>
   );
 }

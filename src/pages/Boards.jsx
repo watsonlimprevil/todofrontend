@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { api } from '../Api/client';
+import { useNavigate } from 'react-router-dom';
 
 export default function Boards() {
   const [boards, setBoards] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
-
+  const [description , setDescription] = useState('')
+  const Navigate = useNavigate()
   useEffect(() => {
-    api('/boards').then(setBoards);
+    api('/boards/').then(setBoards);
   }, []);
 
   async function handleCreateBoard() {
     const newBoard = await api('/boards', {
       method: 'POST',
-      body: { title }
+      body: JSON.stringify({ title , description })
     });
 
     setBoards([...boards, newBoard]);
@@ -70,6 +72,13 @@ export default function Boards() {
               onChange={(e) => setTitle(e.target.value)}
               style={{ width: '100%', padding: '10px', marginTop: '10px' }}
             />
+            <input
+               type="text"
+               placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+             />
+
 
             <button
               onClick={handleCreateBoard}
@@ -100,6 +109,7 @@ export default function Boards() {
         {boards.map((board) => (
           <div
             key={board.id}
+            onClick={() => Navigate(`/boards/${board.id}`)}
             style={{
               background: '#1e1e1e',
               padding: '20px',
@@ -108,6 +118,7 @@ export default function Boards() {
             }}
           >
             {board.title}
+
           </div>
         ))}
       </div>

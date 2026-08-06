@@ -1,19 +1,20 @@
 // src/pages/Signup.jsx
 import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-
+import { useNavigate } from 'react-router-dom';
 export default function Signup() {
   const { signup } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-
+  const nav = useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     const data = await signup(email, password);
     if (data.error) setError(data.error);
+    nav('/boards')
   };
 
   return (

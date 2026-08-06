@@ -1,7 +1,8 @@
 import { useState , useEffect , useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-
+import { useNavigate } from "react-router-dom";
 export default function Login(){
+    const nav = useNavigate()
     const {login} = useContext(AuthContext);
     const [email , setEmail] = useState('')
     const [password , setPassword] = useState('');
@@ -10,6 +11,7 @@ export default function Login(){
     const handleSubmit = async (e) => {
         e.preventDefault();
         await login(email , password);
+        nav('/boards')
     }
 
     return(

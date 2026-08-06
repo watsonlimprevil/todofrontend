@@ -16,9 +16,9 @@ return(
       <Route
         path="/boards"
         element={
-          <protectedRoute>
+          <ProtectedRoute>
             <Boards />
-          </protectedRoute>
+          </ProtectedRoute>
         }
       />
     </Routes>
