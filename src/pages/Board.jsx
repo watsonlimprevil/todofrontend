@@ -13,10 +13,11 @@ export default function Board() {
   const [TitleToEdit, setTitleToEdit] = useState('');
   const [showRenameListModal , setShowRenameListModal] = useState(false);
   const [renameListId , setRenameListId] = useState(null);
-
+  const [slectedTask , setSelectedTask] = useState([])
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
   const [activeListId, setActiveListId] = useState(null);
+  const [showTaskDetailsModal , setShowTaskDetailsModal] = useState(false)
 
 useEffect(() => {
   async function loadBoard() {
@@ -177,286 +178,426 @@ async function handleDeleteTask(taskId , listId){
   );
   setLists(updatedLists);
 }
-  return (
-    <div style={{ padding: '20px' }}>
-      <button style={{
+async function handleUpdateTask() {
+  const updated = await api(`/tasks/${slectedTask.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      title: slectedTask.title,
+      description: slectedTask.description
+    })
+  });
+
+  // Merge updated task into the correct list
+  const newLists = lists.map((list) => {
+    if (list.id !== slectedTask.list_id) return list;
+
+    return {
+      ...list,
+      tasks: list.tasks.map((t) =>
+        t.id === updated.id ? updated : t
+      )
+    };
+  });
+
+  setLists(newLists);
+  setShowTaskDetailsModal(false);
+  setSelectedTask(null);
+}
+
+
+return (
+  <div style={{ padding: '20px' }}>
+    <button
+      style={{
         padding: '10px 20px',
         background: '#444',
-        border : 'none',
-        borderRadius: '6px' ,
-        cursor : 'pointer' ,
-        marginBottom : '20px'
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        marginBottom: '20px'
       }}
       onClick={() => nav('/boards')}
-      >
-        Back to boards
-      </button>
-      <h1>Board #{id}</h1>
+    >
+      Back to boards
+    </button>
 
-      <button
-        onClick={() => setShowListModal(true)}
+    <h1>Board #{id}</h1>
+
+    {/* CREATE LIST BUTTON */}
+    <button
+      onClick={() => setShowListModal(true)}
+      style={{
+        padding: '10px 20px',
+        background: '#2196f3',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        marginBottom: '20px'
+      }}
+    >
+      + New List
+    </button>
+
+    {/* CREATE LIST MODAL */}
+    {showListModal && (
+      <div
         style={{
-          padding: '10px 20px',
-          background: '#2196f3',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          marginBottom: '20px'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        + New List
-      </button>
-
-      {showListModal && (
         <div
           style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '300px'
           }}
         >
-          <div
+          <h2>Create List</h2>
+
+          <input
+            type="text"
+            placeholder="List title"
+            value={listTitle}
+            onChange={(e) => setListTitle(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
+
+          <button
+            onClick={handleCreateList}
             style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '300px'
+              marginTop: '15px',
+              padding: '10px',
+              width: '100%',
+              background: '#2196f3',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
             }}
           >
-            <h2>Create List</h2>
+            Create
+          </button>
 
-            <input
-              type="text"
-              placeholder="List title"
-              value={listTitle}
-              onChange={(e) => setListTitle(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-            />
-
-            <button
-              onClick={handleCreateList}
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                width: '100%',
-                background: '#2196f3',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              Create
-            </button>
-            <button 
-             onClick={() => {
+          <button
+            onClick={() => {
               setShowListModal(false);
               setListTitle('');
             }}
-          style={{
-            padding : '8px 12px',
-            background: '#b71c1c',
-            border: 'none',
-            cursor : 'pointer',
-            color : 'white'
-          }}
-          >
-            ❌ Cancel
-          </button>
-          </div>
-        </div>
-      )}
-
-      {showTaskModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <div
             style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '300px'
+              padding: '8px 12px',
+              background: '#b71c1c',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'white'
             }}
           >
-            <h2>Create Task</h2>
+            ❌ Cancel
+          </button>
+        </div>
+      </div>
+    )}
 
-            <input
-              type="text"
-              placeholder="Task title"
-              value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-            />
-
-            <button
-              onClick={handleCreateTask}
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                width: '100%',
-                background: '#673ab7',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              Create
-            </button>
-            <button 
-          onClick={() => {
-            setShowModal(false);
-            setTaskTitle('');
-            
-          }}
+    {/* CREATE TASK MODAL */}
+    {showTaskModal && activeListId && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <div
           style={{
-            padding : '8px 12px',
-            background: '#b71c1c',
-            border: 'none',
-            cursor : 'pointer',
-            color : 'white'
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '300px'
           }}
+        >
+          <h2>Create Task</h2>
+
+          <input
+            type="text"
+            placeholder="Task title"
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
+
+          <button
+            onClick={handleCreateTask}
+            style={{
+              marginTop: '15px',
+              padding: '10px',
+              width: '100%',
+              background: '#673ab7',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Create
+          </button>
+
+          <button
+            onClick={() => {
+              setShowTaskModal(false);
+              setTaskTitle('');
+            }}
+            style={{
+              padding: '8px 12px',
+              background: '#b71c1c',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'white'
+            }}
           >
             ❌ Cancel
           </button>
-          </div>
         </div>
-      )}
+      </div>
+    )}
 
-      <DragDropContext onDragEnd={handleDragEnd}>
+    {/* TASK DETAILS MODAL (THE NEW FEATURE) */}
+    {showTaskDetailsModal && slectedTask && (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
         <div
           style={{
-            display: 'flex',
-            gap: '20px',
-            marginTop: '20px'
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '350px'
           }}
         >
-          {lists.map((list) => (
-            <Droppable droppableId={String(list.id)} key={list.id}>
-              {(provided) => (
-                <div
+          <h2>Edit Task</h2>
+
+          <input
+            type="text"
+            value={slectedTask.title}
+            onChange={(e) =>
+              setSelectedTask({ ...slectedTask, title: e.target.value })
+            }
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
+
+          <textarea
+            value={slectedTask.description || ''}
+            onChange={(e) =>
+              setSelectedTask({
+                ...slectedTask,
+                description: e.target.value
+              })
+            }
+            placeholder="Description"
+            style={{
+              width: '100%',
+              padding: '10px',
+              marginTop: '10px',
+              height: '100px'
+            }}
+          />
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+            <button
+              onClick={handleUpdateTask}
+              style={{
+                padding: '10px',
+                background: '#4caf50',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                flex: 1
+              }}
+            >
+              Save
+            </button>
+
+            <button
+              onClick={() => {
+                setShowTaskDetailsModal(false);
+                setSelectedTask(null);
+              }}
+              style={{
+                padding: '10px',
+                background: '#b71c1c',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                color: 'white',
+                flex: 1
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* DND CONTEXT */}
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '20px',
+          marginTop: '20px'
+        }}
+      >
+        {lists.map((list) => (
+          <Droppable droppableId={String(list.id)} key={list.id}>
+            {(provided) => (
+              <div
                 key={list.id}
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    background: '#1e1e1e',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    width: '250px',
-                    minHeight: '100px'
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                style={{
+                  background: '#1e1e1e',
+                  padding: '20px',
+                  borderRadius: '8px',
+                  width: '250px',
+                  minHeight: '100px'
+                }}
+              >
+                <h3>{list.title}</h3>
+
+                <button
+                  onClick={() => {
+                    setRenameListId(list.id);
+                    setShowRenameListModal(true);
                   }}
                 >
-                  <h3>{list.title}</h3>
-                  <button onClick={() => {
-                   setRenameListId(list.id);
-                   setShowRenameListModal(true)
-                  }}>
-                    + Rename
-                  </button>
-                  <button onClick={() => handleDeleteList(list.id)}
+                  + Rename
+                </button>
+
+                <button
+                  onClick={() => handleDeleteList(list.id)}
+                  style={{
+                    background: '#b71c1c',
+                    border: 'none',
+                    padding: '6px 10px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    color: 'white',
+                    marginLeft: '10px'
+                  }}
+                >
+                  Delete List 🗑️
+                </button>
+
+                {showRenameListModal && (
+                  <div
                     style={{
-                      background : '#b71c1c',
-                      border: 'none',
-                      padding: '6px 10px',
-                      borderRadius : '6px',
-                      cursor : 'pointer' ,
-                      color : 'white',
-                      marginLeft : '10px'
-                    }}
-                    >
-                      Delete List 🗑️
-                  </button>
-                  {showRenameListModal && (
-                    <div 
-                    style={{
-                      backgroundC: '#1e1e1e',
+                      background: '#1e1e1e',
                       padding: '20px',
                       borderRadius: '8px'
-                    }}>
-                      <input 
-                      value={TitleToEdit}
-                      onChange={e => setTitleToEdit(e.target.value)}
-                      placeholder='enter new name...'
-                      />
-                      <button onClick={handleRenameList}>Edit</button>
-                    </div>
-                  )}
-                  {list.tasks?.map((task, index) => (
-                    <Draggable
-                      key={task.id}
-                      draggableId={String(task.id)}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            background: '#2e2e2e',
-                            padding: '10px',
-                            borderRadius: '6px',
-                            marginTop: '10px',
-                            gap: '10px',
-                            ...provided.draggableProps.style
-                          }}
-                        >
-                          {task.title}
-                          < button onClick={ () =>handleDeleteTask(task.id , list.id)} 
-                          
-                        style={{
-                           background: 'transparent',
-                           border: 'none',
-                           color: '#ff6b6b',
-                           fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                             marginLeft: '10px'   // ⭐ spacing from the task text
-                              }}>
-                            ❌
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-                  {provided.placeholder}
-
-                  <button
-                    onClick={() => openTaskModal(list.id)}
-                    style={{
-                      marginTop: '10px',
-                      padding: '8px',
-                      width: '100%',
-                      background: '#673ab7',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer'
                     }}
                   >
-                    + Add Task
-                  </button>
-                </div>
-              )}
-            </Droppable>
-          ))}
-        </div>
-      </DragDropContext>
-    </div>
-  );
+                    <input
+                      value={TitleToEdit}
+                      onChange={(e) => setTitleToEdit(e.target.value)}
+                      placeholder="enter new name..."
+                    />
+                    <button onClick={handleRenameList}>Edit</button>
+                  </div>
+                )}
+
+                {list.tasks?.map((task, index) => (
+                  <Draggable
+                    key={task.id}
+                    draggableId={String(task.id)}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={{
+                          background: '#2e2e2e',
+                          padding: '10px',
+                          borderRadius: '6px',
+                          marginTop: '10px',
+                          gap: '10px',
+                          cursor: 'pointer',
+                          ...provided.draggableProps.style
+                        }}
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setShowTaskDetailsModal(true);
+                        }}
+                      >
+                        {task.title}
+
+                        <button
+                          onClick={() =>
+                            handleDeleteTask(task.id, list.id)
+                          }
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#ff6b6b',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '16px',
+                            marginLeft: '10px'
+                          }}
+                        >
+                          ❌
+                        </button>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {provided.placeholder}
+
+                <button
+                  onClick={() => openTaskModal(list.id)}
+                  style={{
+                    marginTop: '10px',
+                    padding: '8px',
+                    width: '100%',
+                    background: '#673ab7',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  + Add Task
+                </button>
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </div>
+    </DragDropContext>
+  </div>
+);
+
 }
