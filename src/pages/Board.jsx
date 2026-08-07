@@ -4,6 +4,7 @@ import { api } from '../Api/client';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import js from '@eslint/js';
 import Comments from '../components/Comments';
+import SubtasksModal from '../components/SubtasksModal';
 export default function Board() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -18,6 +19,7 @@ export default function Board() {
   const [taskTitle, setTaskTitle] = useState('');
   const [activeListId, setActiveListId] = useState(null);
   const [showTaskDetailsModal , setShowTaskDetailsModal] = useState(false)
+  const [showSubtasksModal , setShowSubtasksModal] = useState(false)
 
 useEffect(() => {
   async function loadBoard() {
@@ -493,6 +495,28 @@ return (
 
                    {/* ⭐⭐⭐ INSERT COMMENTS RIGHT HERE ⭐⭐⭐ */}
              <Comments taskId={slectedTask.id} />
+             <button
+              onClick={() => setShowSubtasksModal(true)}
+              style={{
+              marginTop: "10px",
+              width: "100%",
+              padding: "10px",
+              background: "#1976d2",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              color: "white",
+               }}
+                 >
+              Manage Subtasks
+             </button>
+
+             {showSubtasksModal && (
+             <SubtasksModal
+              taskId={slectedTask.id}
+               onClose={() => setShowSubtasksModal(false)}
+              />
+              )}
           <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
             <button
               onClick={handleUpdateTask}
