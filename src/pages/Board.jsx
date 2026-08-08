@@ -415,7 +415,8 @@ return (
           background: 'rgba(0,0,0,0.6)',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+           zIndex: 9999
         }}
       >
         <div
@@ -738,13 +739,16 @@ return (
                 <button
                   onClick={() => openTaskModal(list.id)}
                   style={{
-                    marginTop: '10px',
-                    padding: '8px',
-                    width: '100%',
-                    background: '#673ab7',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer'
+      position: 'fixed',
+    top: '20%',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: '#1e1e1e',
+    padding: '20px',
+    borderRadius: '8px',
+    zIndex: 999999,
+    isolation: 'isolate',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
                   }}
                 >
                   + Add Task
