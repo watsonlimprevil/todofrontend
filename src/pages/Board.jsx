@@ -8,6 +8,7 @@ import CreateListModal from "../components/CreateListModal";
 import CreateTaskModal from "../components/CreateTaskModal";
 import TaskDetailsModal from "../components/TaskDetailsModal";
 import EditBoardModal from "../components/EditBoardModal";
+import { BoardProvider } from "./BoardContext";
 
 export default function Board() {
   const { id } = useParams();
@@ -167,7 +168,7 @@ export default function Board() {
   }
 
   function handleDragEnd(result) {
-    const { source, destination, draggableId } = result;
+    const { source, destination } = result;
 
     if (!destination) return;
 
@@ -220,95 +221,104 @@ export default function Board() {
   }
 
   return (
-    <div className="board-page" style={{ padding: "20px" }}>
-      <button
-        style={{
-          padding: "10px 20px",
-          background: "#444",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          marginBottom: "20px"
-        }}
-        onClick={() => nav("/boards")}
-      >
-        Back to boards
-      </button>
-
-      <h1>Board #{id}</h1>
-
-      <button
-        onClick={() => setShowListModal(true)}
-        style={{
-          padding: "10px 20px",
-          background: "#2196f3",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          marginBottom: "20px"
-        }}
-      >
-        + New List
-      </button>
-
-      {showListModal && (
-        <CreateListModal
-          listTitle={listTitle}
-          setListTitle={setListTitle}
-          onCreate={handleCreateList}
-          onClose={() => {
-            setShowListModal(false);
-            setListTitle("");
+    <BoardProvider
+      value={{
+        setSelectedTask,
+        setShowTaskDetailsModal,
+        handleToggleCompleted,
+        handleDeleteTask
+      }}
+    >
+      <div className="board-page" style={{ padding: "20px" }}>
+        <button
+          style={{
+            padding: "10px 20px",
+            background: "#444",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginBottom: "20px"
           }}
-        />
-      )}
+          onClick={() => nav("/boards")}
+        >
+          Back to boards
+        </button>
 
-      {showTaskModal && (
-        <CreateTaskModal
-          taskTitle={taskTitle}
-          setTaskTitle={setTaskTitle}
-          onCreate={handleCreateTask}
-          onClose={() => {
-            setShowTaskModal(false);
-            setTaskTitle("");
+        <h1>Board #{id}</h1>
+
+        <button
+          onClick={() => setShowListModal(true)}
+          style={{
+            padding: "10px 20px",
+            background: "#2196f3",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginBottom: "20px"
           }}
-        />
-      )}
+        >
+          + New List
+        </button>
 
-      {showTaskDetailsModal && selectedTask && (
-        <TaskDetailsModal
-          task={selectedTask}
-          setTask={setSelectedTask}
-          onSave={handleUpdateTask}
-          onClose={() => {
-            setShowTaskDetailsModal(false);
-            setSelectedTask(null);
-          }}
-          showSubtasksModal={showSubtasksModal}
-          setShowSubtasksModal={setShowSubtasksModal}
-        />
-      )}
+        {showListModal && (
+          <CreateListModal
+            listTitle={listTitle}
+            setListTitle={setListTitle}
+            onCreate={handleCreateList}
+            onClose={() => {
+              setShowListModal(false);
+              setListTitle("");
+            }}
+          />
+        )}
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-          {lists.map((list) => (
-            <List
-              key={list.id}
-              list={list}
-              onRename={(id) => {
-                setRenameListId(id);
-                setShowRenameListModal(true);
-              }}
-              onDelete={handleDeleteList}
-              onAddTask={openTaskModal}
-              showRenameListModal={showRenameListModal}
-              TitleToEdit={TitleToEdit}
-              setTitleToEdit={setTitleToEdit}
-              handleRenameList={handleRenameList}
-            />
-          ))}
-        </div>
-      </DragDropContext>
-    </div>
+        {showTaskModal && (
+          <CreateTaskModal
+            taskTitle={taskTitle}
+            setTaskTitle={setTaskTitle}
+            onCreate={handleCreateTask}
+            onClose={() => {
+              setShowTaskModal(false);
+              setTaskTitle("");
+            }}
+          />
+        )}
+
+        {showTaskDetailsModal && selectedTask && (
+          <TaskDetailsModal
+            task={selectedTask}
+            setTask={setSelectedTask}
+            onSave={handleUpdateTask}
+            onClose={() => {
+              setShowTaskDetailsModal(false);
+              setSelectedTask(null);
+            }}
+            showSubtasksModal={showSubtasksModal}
+            setShowSubtasksModal={setShowSubtasksModal}
+          />
+        )}
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+            {lists.map((list) => (
+              <List
+                key={list.id}
+                list={list}
+                onRename={(id) => {
+                  setRenameListId(id);
+                  setShowRenameListModal(true);
+                }}
+                onDelete={handleDeleteList}
+                onAddTask={openTaskModal}
+                showRenameListModal={showRenameListModal}
+                TitleToEdit={TitleToEdit}
+                setTitleToEdit={setTitleToEdit}
+                handleRenameList={handleRenameList}
+              />
+            ))}
+          </div>
+        </DragDropContext>
+      </div>
+    </BoardProvider>
   );
 }
