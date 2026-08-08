@@ -3,6 +3,7 @@ import { api } from '../Api/client';
 import { useNavigate } from 'react-router-dom';
 import EditBoardModal from '../components/EditBoardModal';
 import BoardInsights from '../components/BoardInsights';
+import RecentActivity from '../components/RecentActivity';
 export default function Boards() {
   const [boards, setBoards] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -11,17 +12,16 @@ export default function Boards() {
   const Navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [editingBoard, setEditingBoard] = useState(null);
+  const [activity , setActivity] = useState([])
 
   useEffect(() => {
     api('/boards/').then(setBoards);
   }, []);
 
-  useEffect(() => {
-    api('/boards').then(data => {
-      console.log('Boards from server' , data);
-      
-    })
-  },[])
+useEffect(() =>{
+  const data = api('/activity')
+  setActivity(data)
+},[])
 
   useEffect(() => {
   const handleScroll = () => {
@@ -254,6 +254,7 @@ export default function Boards() {
     {/* INSIGHTS AT THE BOTTOM */}
     <h2 className='insights-title'>Workspace Insights </h2>
     <BoardInsights boards={boards} />
+    <RecentActivity activity={activity}/>
 
   </div>
 );

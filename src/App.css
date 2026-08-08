@@ -465,3 +465,55 @@
   transform: translateY(var(--parallax-offset, 0px));
 }
 
+.activity-container {
+  margin-top: 60px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+
+  opacity: 0;
+  transform: translateY(40px);
+  animation: activityReveal 0.8s ease forwards;
+  animation-delay: 0.4s;
+}
+
+@keyframes activityReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activity-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-bottom: 20px;
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.activity-message {
+  opacity: 0.9;
+}
+
+.activity-time {
+  opacity: 0.6;
+  font-size: 13px;
+}
