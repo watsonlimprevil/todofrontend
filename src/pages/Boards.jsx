@@ -8,6 +8,8 @@ export default function Boards() {
   const [title, setTitle] = useState('');
   const [description , setDescription] = useState('')
   const Navigate = useNavigate()
+  const [search , setSearch] = useState('')
+  const [editingBoard , setEditingBoard] = useState(null)
   useEffect(() => {
     api('/boards/').then(setBoards);
   }, []);
@@ -30,9 +32,33 @@ export default function Boards() {
     const filteredBoard = boards.filter(board => board.id !== boardId);
     setBoards(filteredBoard)
   }
+const handleRenameBoard = async (id, newTitle) => {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/boards/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ title: newTitle }),
+    });
+
+    const updated = await res.json();
+
+    setBoards((prev) =>
+      prev.map((b) => (b.id === updated.id ? updated : b))
+    );
+
+    setEditingBoard(null);
+  } catch (err) {
+    console.error("Failed to rename board", err);
+  }
+};
+
 
 return (
-  <div style={{ padding: '20px' }}>
+  <div 
+    className='board-page'
+    style={{ padding: '20px' }}
+  >
     <h1>Your Boards</h1>
 
     <button
@@ -48,6 +74,24 @@ return (
     >
       + New Board
     </button>
+
+    <input 
+      type='text'
+      placeholder='search boards...'
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      style={{
+        width : '100%',
+        padding: '12px 16px',
+        borderRadius: '10px',
+        border: 'none',
+        marginTop: '20px',
+        fontSize : '16px',
+        background: 'rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(8px)',
+        color : 'white'
+      }}
+    />
 
     {showModal && (
       <div
@@ -103,19 +147,20 @@ return (
           >
             Create
           </button>
+
           <button 
-          onClick={() => {
-            setShowModal(false);
-            setTitle('');
-            setDescription('')
-          }}
-          style={{
-            padding : '8px 12px',
-            background: '#b71c1c',
-            border: 'none',
-            cursor : 'pointer',
-            color : 'white'
-          }}
+            onClick={() => {
+              setShowModal(false);
+              setTitle('');
+              setDescription('');
+            }}
+            style={{
+              padding : '8px 12px',
+              background: '#b71c1c',
+              border: 'none',
+              cursor : 'pointer',
+              color : 'white'
+            }}
           >
             ❌ Cancel
           </button>
@@ -131,44 +176,45 @@ return (
         marginTop: '20px'
       }}
     >
-      {boards.map((board) => (
-        <div
-          key={board.id}
-          style={{
-            background: '#1e1e1e',
-            padding: '20px',
-            borderRadius: '8px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}
-        >
-          <span
-            onClick={() => Navigate(`/boards/${board.id}`)}
-            style={{ cursor: 'pointer', fontSize: '18px' }}
+      {boards
+        .filter((board) =>
+          board.title.toLowerCase().includes(search.toLowerCase())
+        )
+        .map((board) => (
+          <div
+            key={board.id}
+            className='board-card'
           >
-            {board.title}
-          </span>
+            <span
+              onClick={() => Navigate(`/boards/${board.id}`)}
+              style={{ cursor: 'pointer', fontSize: '18px' }}
+            >
+              {board.title}
+            </span>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation(); // prevents navigation
-              handleDelteBoard(board.id);
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#ff6b6b',
-              fontSize: '20px',
-              cursor: 'pointer'
-            }}
-          >
-            ✕
-          </button>
-        </div>
-      ))}
+            <div className="board-card-actions">
+              <button onClick={() => setEditingBoard(board)}>Edit</button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelteBoard(board.id);
+                }}
+              >
+                Delete
+              </button>
+
+              {editingBoard && (
+                <EditBoardModal
+                  board={editingBoard}
+                  onClose={() => setEditingBoard(null)}
+                  onSave={handleRenameBoard}
+                />
+              )}
+            </div>
+          </div>
+        ))}
     </div>
   </div>
 );
-
 }

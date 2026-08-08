@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Boards from './pages/Boards';
 import Signup from './pages/SignUp';
 import Board from './pages/Board';
+import './App.css';
+
 export default function App(){
 return(
 <BrowserRouter>

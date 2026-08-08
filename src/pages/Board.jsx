@@ -5,6 +5,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import js from '@eslint/js';
 import Comments from '../components/Comments';
 import SubtasksModal from '../components/SubtasksModal';
+import EditBoardModal from '../components/EditBoardModal';
 export default function Board() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -234,7 +235,9 @@ async function handleToggleCompleted(task, value) {
 
 
 return (
-  <div style={{ padding: '20px' }}>
+  <div style={{ padding: '20px' }} 
+  className='board-page'
+  >
     <button
       style={{
         padding: '10px 20px',
@@ -567,6 +570,7 @@ return (
           <Droppable droppableId={String(list.id)} key={list.id}>
             {(provided) => (
               <div
+              className='list-container'
                 key={list.id}
                 ref={provided.innerRef}
                 {...provided.droppableProps}

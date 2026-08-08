@@ -182,3 +182,153 @@
     border-right-color: var(--border);
   }
 }
+
+.board-page {
+  background-image: url('/skyline.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+.board-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45); /* adjust darkness */
+  backdrop-filter: blur(2px);   /* subtle blur */
+  z-index: 0;
+}
+
+.board-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+.list-container {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+}
+
+.lists-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.list-container h2 {
+  margin-bottom: 12px;
+}
+
+.task-card {
+  margin-bottom: 10px;
+}
+
+.list-container {
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.10),
+    rgba(255,255,255,0.05)
+  );
+}
+
+.board-card {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2),
+              0 4px 20px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  color: white;
+}
+
+.board-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+
+.board-card-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  gap: 8px;
+}
+
+.board-card:hover .board-card-actions {
+  display: flex;
+}
+.board-card-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background: #4caf50;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.cancel-btn {
+  background: #ff6b6b;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
