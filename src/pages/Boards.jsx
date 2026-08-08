@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../Api/client';
 import { useNavigate } from 'react-router-dom';
 import EditBoardModal from '../components/EditBoardModal';
-
+import BoardInsights from '../components/BoardInsights';
 export default function Boards() {
   const [boards, setBoards] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -15,6 +15,24 @@ export default function Boards() {
   useEffect(() => {
     api('/boards/').then(setBoards);
   }, []);
+
+  useEffect(() => {
+    api('/boards').then(data => {
+      console.log('Boards from server' , data);
+      
+    })
+  },[])
+
+  useEffect(() => {
+  const handleScroll = () => {
+    const offset = window.scrollY * 0.05;
+    document.documentElement.style.setProperty('--parallax-offset', `${offset}px`);
+  };
+
+  window.addEventListener('scroll', handleScroll);
+  return () => window.removeEventListener('scroll', handleScroll);
+}, []);
+
 
   async function handleCreateBoard() {
     const newBoard = await api('/boards', {
@@ -70,156 +88,174 @@ export default function Boards() {
   });
 
   return (
-    <div className="board-page" style={{ padding: '20px' }}>
-      <h1>Your Boards</h1>
+  <div className="board-page" style={{ padding: '20px' }}>
+    <h1>Your Boards</h1>
 
-      <button
-        onClick={() => setShowModal(true)}
-        style={{
-          padding: '10px 20px',
-          background: '#4caf50',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          marginBottom: '20px'
-        }}
-      >
-        + New Board
-      </button>
+    <button
+      onClick={() => setShowModal(true)}
+      style={{
+        padding: '10px 20px',
+        background: '#4caf50',
+        border: 'none',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        marginBottom: '20px'
+      }}
+    >
+      + New Board
+    </button>
 
-      <input
-        type="text"
-        placeholder="search boards or lists..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '12px 16px',
-          borderRadius: '10px',
-          border: 'none',
-          marginTop: '20px',
-          fontSize: '16px',
-          background: 'rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(8px)',
-          color: 'white'
-        }}
-      />
+    <input
+      type="text"
+      placeholder="search boards or lists..."
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '12px 16px',
+        borderRadius: '10px',
+        border: 'none',
+        marginTop: '20px',
+        fontSize: '16px',
+        background: 'rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(8px)',
+        color: 'white'
+      }}
+    />
 
-      {showModal && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          <div
-            style={{
-              background: '#1e1e1e',
-              padding: '20px',
-              borderRadius: '8px',
-              width: '300px'
-            }}
-          >
-            <h2>Create Board</h2>
-
-            <input
-              type="text"
-              placeholder="Board title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-            />
-
-            <input
-              type="text"
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-            />
-
-            <button
-              onClick={handleCreateBoard}
-              style={{
-                marginTop: '15px',
-                padding: '10px',
-                width: '100%',
-                background: '#4caf50',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              Create
-            </button>
-
-            <button
-              onClick={() => {
-                setShowModal(false);
-                setTitle('');
-                setDescription('');
-              }}
-              style={{
-                padding: '8px 12px',
-                background: '#b71c1c',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'white'
-              }}
-            >
-              ❌ Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
+    {showModal && (
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '20px',
-          marginTop: '20px'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        {filteredBoards.map(board => (
-          <div key={board.id} className="board-card">
-            <span
-              onClick={() => Navigate(`/boards/${board.id}`)}
-              style={{ cursor: 'pointer', fontSize: '18px' }}
-            >
-              {board.title}
-            </span>
+        <div
+          style={{
+            background: '#1e1e1e',
+            padding: '20px',
+            borderRadius: '8px',
+            width: '300px'
+          }}
+        >
+          <h2>Create Board</h2>
 
-            <div className="board-card-actions">
-              <button onClick={() => setEditingBoard(board)}>Edit</button>
+          <input
+            type="text"
+            placeholder="Board title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteBoard(board.id);
-                }}
-              >
-                Delete
-              </button>
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+          />
 
-              {editingBoard && (
-                <EditBoardModal
-                  board={editingBoard}
-                  onClose={() => setEditingBoard(null)}
-                  onSave={handleRenameBoard}
-                />
-              )}
-            </div>
-          </div>
-        ))}
+          <button
+            onClick={handleCreateBoard}
+            style={{
+              marginTop: '15px',
+              padding: '10px',
+              width: '100%',
+              background: '#4caf50',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Create
+          </button>
+
+          <button
+            onClick={() => {
+              setShowModal(false);
+              setTitle('');
+              setDescription('');
+            }}
+            style={{
+              padding: '8px 12px',
+              background: '#b71c1c',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'white'
+            }}
+          >
+            ❌ Cancel
+          </button>
+        </div>
       </div>
+    )}
+
+    {/* BOARD GRID */}
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '20px',
+        marginTop: '20px'
+      }}
+    >
+      {filteredBoards.map(board => (
+        <div key={board.id} className="board-card">
+          <span
+            onClick={() => Navigate(`/boards/${board.id}`)}
+            style={{ cursor: 'pointer', fontSize: '18px' }}
+          >
+            {board.title}
+          </span>
+
+          <div className="board-card-actions">
+            <button onClick={() => setEditingBoard(board)}>Edit</button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteBoard(board.id);
+              }}
+            >
+              Delete
+            </button>
+
+            {editingBoard && (
+              <EditBoardModal
+                board={editingBoard}
+                onClose={() => setEditingBoard(null)}
+                onSave={handleRenameBoard}
+              />
+            )}
+          </div>
+        </div>
+      ))}
     </div>
-  );
+
+    {/* DIVIDER */}
+    <div
+      style={{
+        width: '100%',
+        height: '1px',
+        background: 'rgba(255,255,255,0.15)',
+        margin: '40px 0 20px',
+        backdropFilter: 'blur(4px)'
+      }}
+    ></div>
+    <div className="insights-divider"></div>
+    {/* INSIGHTS AT THE BOTTOM */}
+    <h2 className='insights-title'>Workspace Insights </h2>
+    <BoardInsights boards={boards} />
+
+  </div>
+);
+
 }

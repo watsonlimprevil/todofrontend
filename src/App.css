@@ -184,28 +184,56 @@
 }
 
 .board-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
   background-image: url('/skyline.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
+
+  /* Smooth fade-in for the whole page */
+  animation: fadeIn 0.6s ease forwards;
 }
+
+/* Cinematic gradient + deeper blur + vignette */
 .board-page::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.45); /* adjust darkness */
-  backdrop-filter: blur(2px);   /* subtle blur */
+
+  /* Layered gradients for premium look */
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(0,0,0,0.15) 0%,
+      rgba(0,0,0,0.55) 60%,
+      rgba(0,0,0,0.75) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.55),
+      rgba(0,0,0,0.85)
+    );
+
+  /* Stronger blur for glass effect */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
   z-index: 0;
 }
 
+/* Ensure all content sits above the overlay */
 .board-page > * {
   position: relative;
   z-index: 1;
 }
 
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 .list-container {
   background: rgba(255, 255, 255, 0.12);
@@ -303,3 +331,137 @@
   cursor: pointer;
   color: white;
 }
+
+.insights-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.insight-card {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+
+.insight-card h3 {
+  font-size: 32px;
+  margin: 0;
+  color: white;
+}
+
+.insight-card p {
+  margin-top: 6px;
+  opacity: 0.8;
+  color: white;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.insights-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.15);
+  margin: 60px 0 40px; /* pushes insights DOWN */
+  backdrop-filter: blur(4px);
+}
+
+.insights-container {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 60px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+
+  opacity: 0;
+  transform: translateY(40px);
+  animation: insightsReveal 0.8s ease forwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes insightsReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.insight-card {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.4);
+}
+
+.insight-card h3 {
+  position: relative;
+}
+
+.insight-card h3::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    rgba(255,255,255,0.18),
+    transparent 70%
+  );
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.5; }
+  100% { opacity: 0.2; }
+}
+
+.insights-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+  opacity: 0.85;
+  margin-bottom: 20px;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.insights-container {
+  transform: translateY(var(--parallax-offset, 0px));
+}
+
