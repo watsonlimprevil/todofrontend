@@ -15,6 +15,10 @@ export default function Boards() {
   const [search, setSearch] = useState('');
   const [editingBoard, setEditingBoard] = useState(null);
   const [activity , setActivity] = useState([])
+  const showInsights = JSON.parse(localStorage.getItem("showInsights") || "true");
+const showActivity = JSON.parse(localStorage.getItem("showActivity") || "true");
+
+
 
   useEffect(() => {
     api('/boards/').then(setBoards);
@@ -59,26 +63,23 @@ useEffect(() => {
     setBoards(boards.filter(board => board.id !== boardId));
   }
 
-  const handleRenameBoard = async (id, newTitle) => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/boards/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ title: newTitle }),
-      });
+ const handleRenameBoard = async (id, newTitle) => {
+  try {
+    const updated = await api(`/boards/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ title: newTitle })
+    });
 
-      const updated = await res.json();
+    setBoards(prev =>
+      prev.map(b => (b.id === updated.id ? updated : b))
+    );
 
-      setBoards(prev =>
-        prev.map(b => (b.id === updated.id ? updated : b))
-      );
+    setEditingBoard(null);
+  } catch (err) {
+    console.error("Failed to rename board", err);
+  }
+};
 
-      setEditingBoard(null);
-    } catch (err) {
-      console.error("Failed to rename board", err);
-    }
-  };
 
   // ⭐ SEARCH LOGIC (Boards + Lists)
   const filteredBoards = boards.filter(board => {
@@ -111,7 +112,8 @@ useEffect(() => {
         border: 'none',
         borderRadius: '6px',
         cursor: 'pointer',
-        marginBottom: '20px'
+        marginBottom: '20px',
+        
       }}
     >
       + New Board
@@ -146,7 +148,8 @@ useEffect(() => {
           background: 'rgba(0,0,0,0.6)',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          zIndex:9999
         }}
       >
         <div
@@ -265,8 +268,8 @@ useEffect(() => {
     <div className="insights-divider"></div>
     {/* INSIGHTS AT THE BOTTOM */}
     <h2 className='insights-title'>Workspace Insights </h2>
-    <BoardInsights boards={boards} />
-    <RecentActivity activity={activity}/>
+  {showInsights && <BoardInsights boards={boards} />}
+  {showActivity && <RecentActivity activity={activity} />}
 
   </div>
 );

@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import "./Settings.css";
-
+import { api } from "../Api/client";
+import { useNavigate } from "react-router-dom";
 export default function Settings() {
   // Theme
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+const nav = useNavigate()
+
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+   const [input, setInput] = useState("");
 
   // Accent color
   const [accent, setAccent] = useState(localStorage.getItem("accent") || "#4f46e5");
@@ -32,14 +38,40 @@ export default function Settings() {
     localStorage.setItem("showActivity", showActivity);
   }, [theme, accent, background, showInsights, showActivity]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
+const handleSend = async () => {
+  if (!input.trim()) return;
+
+  // Add user message
+  setMessages((prev) => [...prev, { sender: "user", text: input }]);
+
+  const userMessage = input;
+  setInput("");
+
+  // Call backend using your helper
+  const data = await api("/assistant", {
+    method: "POST",
+    body: JSON.stringify({ message: userMessage })
+  });
+
+  // Add assistant reply
+  setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
+};
+
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  window.location.href = "/login";
+};
 
   return (
     <div className="settings-page">
       <h1 className="settings-title">Settings</h1>
+      
+      <button 
+        className="back-btn"
+        onClick={() => nav('/boards')}
+        >
+        ← Back to Boards
+       </button>
 
       {/* Profile Section */}
       <div className="settings-card">
@@ -110,17 +142,43 @@ export default function Settings() {
       </div>
 
       {/* AI Assistant Section */}
-      <div className="settings-card">
-        <h2>AI Assistant</h2>
-        <p>This will be your custom in-app helper. We can build:</p>
-        <ul>
-          <li>Task suggestions</li>
-          <li>Board organization tips</li>
-          <li>Help commands</li>
-          <li>Mini chat interface</li>
-        </ul>
-        <button className="assistant-btn">Open Assistant</button>
+      {/* AI Assistant Section */}
+<div className="settings-card">
+  <h2>AI Assistant</h2>
+
+  {!assistantOpen && (
+    <button className="assistant-btn" onClick={() => setAssistantOpen(true)}>
+      Open Assistant
+    </button>
+  )}
+
+  {assistantOpen && (
+    <div className="assistant-chat">
+      <div className="assistant-messages">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`assistant-message ${msg.sender}`}
+          >
+        {msg.text}
+          </div>
+        ))}
       </div>
+
+      <div className="assistant-input">
+        <input
+          type="text"
+          value={input}
+          placeholder="Ask me anything..."
+          onChange={(e) => setInput(e.target.value)}
+        />
+
+        <button onClick={handleSend}>Send</button>
+      </div>
+    </div>
+  )}
+</div>
+
     </div>
   );
 }

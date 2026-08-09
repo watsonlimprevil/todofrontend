@@ -108,8 +108,10 @@ export default function Board() {
 
     await api(`/lists/${listId}`, { method: "DELETE" });
 
+
     const updated = lists.filter((list) => list.id !== listId);
     setLists(updated);
+    console.log('list to delete',listId)
   }
 
   async function handleRenameList() {
@@ -232,15 +234,17 @@ export default function Board() {
       <div className="board-page" style={{ padding: "20px" }}>
         <button
           style={{
-            padding: "10px 20px",
-            background: "#444",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            marginBottom: "20px"
-          }}
-          onClick={() => nav("/boards")}
-        >
+             padding: "10px 20px",
+             background: "linear-gradient(135deg, #2a2a2a, #3d3d3d)",
+             border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+               marginBottom: "20px",
+             color: "white",
+              fontWeight: "500"
+             }}
+              onClick={() => nav("/boards")}
+               >
           Back to boards
         </button>
 

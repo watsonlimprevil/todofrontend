@@ -25,33 +25,51 @@ export default function TaskDetailsModal({
         alignItems: "center",
         zIndex: 9999
       }}
+      onClick={onClose}   // click outside closes modal
     >
       <div
         style={{
           background: "#1e1e1e",
           padding: "20px",
           borderRadius: "8px",
-          width: "350px"
+          width: "350px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          position: "relative"
         }}
+        onClick={(e) => e.stopPropagation()}  // prevents closing when clicking inside
       >
+        {/* CLOSE BUTTON */}
+        <button
+          onClick={onClose}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            background: "transparent",
+            border: "none",
+            color: "white",
+            fontSize: "22px",
+            cursor: "pointer"
+          }}
+        >
+          ✕
+        </button>
+
         <h2>Edit Task</h2>
 
         {/* TITLE */}
         <input
           type="text"
           value={task.title}
-          onChange={(e) =>
-            setTask({ ...task, title: e.target.value })
-          }
+          onChange={(e) => setTask({ ...task, title: e.target.value })}
           style={{ width: "100%", padding: "10px", marginTop: "10px" }}
         />
 
         {/* DESCRIPTION */}
         <textarea
           value={task.description || ""}
-          onChange={(e) =>
-            setTask({ ...task, description: e.target.value })
-          }
+          onChange={(e) => setTask({ ...task, description: e.target.value })}
           placeholder="Description"
           style={{
             width: "100%",
@@ -64,9 +82,7 @@ export default function TaskDetailsModal({
         {/* PRIORITY */}
         <select
           value={task.priority || "low"}
-          onChange={(e) =>
-            setTask({ ...task, priority: e.target.value })
-          }
+          onChange={(e) => setTask({ ...task, priority: e.target.value })}
           style={{
             width: "100%",
             padding: "10px",
@@ -85,9 +101,7 @@ export default function TaskDetailsModal({
         <input
           type="date"
           value={task.due_date || ""}
-          onChange={(e) =>
-            setTask({ ...task, due_date: e.target.value })
-          }
+          onChange={(e) => setTask({ ...task, due_date: e.target.value })}
           style={{
             width: "100%",
             padding: "10px",

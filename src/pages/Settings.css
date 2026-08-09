@@ -109,3 +109,117 @@
   --border-color: rgba(0,255,255,0.3);
   text-shadow: 0 0 8px var(--text-color);
 }
+
+
+/* ============================
+   BACKGROUND: DEFAULT
+   ============================ */
+[data-bg="default"] {
+  background: var(--bg-color);
+}
+
+/* ============================
+   BACKGROUND: GRADIENT
+   ============================ */
+[data-bg="gradient"] {
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  transition: background 0.5s ease;
+}
+
+/* ============================
+   BACKGROUND: SOLID
+   ============================ */
+[data-bg="solid"] {
+  background: #1e1e1e;
+  transition: background 0.5s ease;
+}
+
+/* ============================
+   BACKGROUND: IMAGE 1
+   ============================ */
+[data-bg="image1"] {
+  background: url('/skyline2.jpg') no-repeat center/cover;
+  transition: background 0.5s ease;
+}
+
+/* ============================
+   BACKGROUND: IMAGE 2
+   ============================ */
+[data-bg="image2"] {
+  background: url('/skyline3.jpg') no-repeat center/cover;
+  transition: background 0.5s ease;
+}
+
+.assistant-chat {
+  margin-top: 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  background: var(--card-bg);
+  max-height: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.assistant-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.assistant-message {
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  max-width: 80%;
+}
+
+.assistant-message.user {
+  background: var(--accent-color);
+  color: white;
+  margin-left: auto;
+}
+
+.assistant-message.bot {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--border-color);
+}
+
+.assistant-input {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.assistant-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-color);
+}
+
+.assistant-input button {
+  padding: 10px 16px;
+  background: var(--accent-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+}
+
+.back-btn {
+  margin-bottom: 20px;
+  padding: 8px 14px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  opacity: 0.9;
+}
