@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import EditBoardModal from '../components/EditBoardModal';
 import BoardInsights from '../components/BoardInsights';
 import RecentActivity from '../components/RecentActivity';
+import { FiSettings } from 'react-icons/fi';
+import { Link } from "react-router-dom";
 export default function Boards() {
   const [boards, setBoards] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -18,10 +20,16 @@ export default function Boards() {
     api('/boards/').then(setBoards);
   }, []);
 
-useEffect(() =>{
-  const data = api('/activity')
-  setActivity(data)
-},[])
+useEffect(() => {
+  const loadActivity = async () => {
+    const data = await api('/activity');
+    console.log("Activity:", data);
+    setActivity(Array.isArray(data) ? data : []);
+  };
+
+  loadActivity();
+}, []);
+
 
   useEffect(() => {
   const handleScroll = () => {
@@ -89,8 +97,12 @@ useEffect(() =>{
 
   return (
   <div className="board-page" style={{ padding: '20px' }}>
+    <div className='boards-header'>
     <h1>Your Boards</h1>
-
+    <Link to='/settings' className='settings-icon'>
+    <FiSettings size={26} />
+    </Link>
+    </div>
     <button
       onClick={() => setShowModal(true)}
       style={{

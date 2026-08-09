@@ -6,6 +6,7 @@ import Boards from './pages/Boards';
 import Signup from './pages/SignUp';
 import Board from './pages/Board';
 import './App.css';
+import Settings from './pages/Settings';
 
 export default function App(){
 return(
@@ -23,6 +24,7 @@ return(
           </ProtectedRoute>
         }
       />
+      <Route path='/settings' element={<Settings/>}/>
     </Routes>
   </AuthProvider>
 </BrowserRouter>

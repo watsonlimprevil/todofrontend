@@ -517,3 +517,22 @@
   opacity: 0.6;
   font-size: 13px;
 }
+
+.boards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 5px;
+  margin-bottom: 20px;
+}
+
+.settings-icon {
+  color: var(--accent-color);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.settings-icon:hover {
+  transform: rotate(20deg);
+  opacity: 0.8;
+}
