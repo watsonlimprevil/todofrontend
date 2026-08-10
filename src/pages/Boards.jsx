@@ -34,6 +34,16 @@ useEffect(() => {
   loadActivity();
 }, []);
 
+async function refreshBoards() {
+  const updatedBoards = await api("/boards");
+  setBoards(updatedBoards);
+}
+
+useEffect(() => {
+  refreshBoards();
+}, [location.pathname]);
+
+
 
   useEffect(() => {
   const handleScroll = () => {
