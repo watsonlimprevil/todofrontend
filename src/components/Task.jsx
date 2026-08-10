@@ -23,7 +23,7 @@ export default function Task({ task, index, listId }) {
           {/* INNER CARD — receives the transform */}
           <div
             {...provided.dragHandleProps}
-            className="task-card"
+            className={`task-card ${task.completed ? "completed-task" : ""}`}
             style={{
               background: "#2e2e2e",
               padding: "10px",

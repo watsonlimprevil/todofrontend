@@ -536,3 +536,14 @@
   transform: rotate(20deg);
   opacity: 0.8;
 }
+
+.task-card {
+  transition: all 0.25s ease;
+}
+
+.completed-task {
+  opacity: 0.6;
+  transform: scale(0.96);
+  text-decoration: line-through;
+  background: #1f1f1f;
+}
