@@ -318,6 +318,7 @@ export default function Board() {
                 TitleToEdit={TitleToEdit}
                 setTitleToEdit={setTitleToEdit}
                 handleRenameList={handleRenameList}
+                setShowRenameListModal={setShowRenameListModal}
               />
             ))}
           </div>
