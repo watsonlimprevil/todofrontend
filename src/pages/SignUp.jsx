@@ -14,6 +14,8 @@ export default function Signup() {
 
     const data = await signup(email, password);
     if (data.error) setError(data.error);
+    console.log(import.meta.env.VITE_API_URL);
+
     nav('/login')
   };
 
