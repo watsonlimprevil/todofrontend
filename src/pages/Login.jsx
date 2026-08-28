@@ -4,22 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../Api/client";
 export default function Login(){
     const nav = useNavigate()
-    const {login} = useContext(AuthContext);
     const [email , setEmail] = useState('')
     const [password , setPassword] = useState('');
-
-
- async function handleSubmit(){
-    const res = await api('/auth/login',{
+async function handleSubmit(){
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`,{
         method : 'POST',
         credentials :'include',
-        body:JSON.stringify({email , password})
+        body : JSON.stringify({email , password})
     });
-    if(res.token){
-        localStorage.setItem('token', res.token )
+    const data = await res.json();
+    if(data.token){
+        localStorage.setItem('token', data.token);
         nav('/boards')
     }
- }
+}
 
     return(
         <form onSubmit={handleSubmit}>
