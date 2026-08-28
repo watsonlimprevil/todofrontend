@@ -8,11 +8,16 @@ export default function Login(){
     const [password , setPassword] = useState('');
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        await login(email , password);
+ async function handleSubmit(){
+    const res = await api('/auth/login',{
+        method : 'POST',
+        body:JSON.stringify({email ,password})
+    });
+    if(res.token){
+        localStorage.setItem('token', res.token )
         nav('/boards')
     }
+ }
 
     return(
         <form onSubmit={handleSubmit}>
