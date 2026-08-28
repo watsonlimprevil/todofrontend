@@ -1,6 +1,7 @@
 import { useState , useEffect , useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { api } from "../Api/client";
 export default function Login(){
     const nav = useNavigate()
     const {login} = useContext(AuthContext);
