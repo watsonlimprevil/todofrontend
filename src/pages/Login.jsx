@@ -11,7 +11,8 @@ export default function Login(){
  async function handleSubmit(){
     const res = await api('/auth/login',{
         method : 'POST',
-        body:JSON.stringify({email ,password})
+        credentials :'include',
+        body:JSON.stringify({email , password})
     });
     if(res.token){
         localStorage.setItem('token', res.token )
