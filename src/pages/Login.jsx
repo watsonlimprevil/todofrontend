@@ -7,7 +7,8 @@ export default function Login(){
     const [email , setEmail] = useState('')
     const [password , setPassword] = useState('');
 
-async function handleSubmit(){
+async function handleSubmit(e){
+    e.preventDefault();
     const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`,{
         method : 'POST',
         credentials :'include',
