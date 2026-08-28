@@ -12,7 +12,7 @@ async function handleSubmit(){
         method : 'POST',
         credentials :'include',
         body : JSON.stringify({email , password}),
-        headers:{'Content-Tpe' : 'application/json'}
+        headers:{'Content-Type' : 'application/json'}
     });
     const data = await res.json();
     if(data.token){
