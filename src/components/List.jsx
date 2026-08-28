@@ -10,7 +10,8 @@ export default function List({
   TitleToEdit,
   setTitleToEdit,
   handleRenameList,
-  renameListId
+  renameListId,
+  setShowRenameListModal
 }) {
   return (
     <Droppable droppableId={String(list.id)} key={list.id}>
