@@ -44,7 +44,7 @@ export default function Signup() {
         Already have an account?{' '}
         <span
           style={{ color: 'cyan', cursor: 'pointer' }}
-          onClick={() => (window.location.href = '/login')}
+          onClick={() => nav('/login')}
         >
           Log in
         </span>
