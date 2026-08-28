@@ -6,11 +6,13 @@ export default function Login(){
     const nav = useNavigate()
     const [email , setEmail] = useState('')
     const [password , setPassword] = useState('');
+
 async function handleSubmit(){
     const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`,{
         method : 'POST',
         credentials :'include',
-        body : JSON.stringify({email , password})
+        body : JSON.stringify({email , password}),
+        headers:{'Content-Tpe' : 'application/json'}
     });
     const data = await res.json();
     if(data.token){
